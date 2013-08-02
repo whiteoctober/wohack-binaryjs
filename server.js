@@ -17,19 +17,35 @@ var bs = BinaryServer({server: server});
 // Wait for new user connections
 bs.on('connection', function(client){
 
+  console.log("NEW CONECTION, " + JSON.stringify(client.id))
+
+  client.send(client.id);
+
   // Incoming stream from browsers
   client.on('stream', function(stream, meta){
 
-    // broadcast to all other clients
-    for(var id in bs.clients){
-      if(bs.clients.hasOwnProperty(id)){
-        var otherClient = bs.clients[id];
-        if(otherClient != client){
-          var send = otherClient.createStream(meta);
-          stream.pipe(send);
-        }
-      }
+    console.log("Send file to " + meta.target);
+
+    stream.on('data', function(data){
+      console.log("data>", data);
+    })
+
+    var other = bs.clients[meta.target];
+
+    if(other){
+      stream.pipe(other.createStream());
     }
+
+    // broadcast to all other clients
+    // for(var id in bs.clients){
+    //   if(bs.clients.hasOwnProperty(id)){
+    //     var otherClient = bs.clients[id];
+    //     if(otherClient != client){
+    //       var send = otherClient.createStream(meta);
+    //       stream.pipe(send);
+    //     }
+    //   }
+    // }
   });
 });
 
