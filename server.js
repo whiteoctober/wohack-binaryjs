@@ -33,7 +33,7 @@ bs.on('connection', function(client){
     var other = bs.clients[meta.target];
 
     if(other){
-      stream.pipe(other.createStream());
+      stream.pipe(other.createStream(meta));
     }
 
     // broadcast to all other clients

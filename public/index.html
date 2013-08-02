@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script src="http://cdn.binaryjs.com/0/binary.js"></script>
+  <script type="text/javascript" src="/transport-binaryjs.js"></script>
 </head>
 <body style="background-size:cover">
 
@@ -13,43 +13,10 @@
 
   <script type="text/javascript">
 
-    var client_id;
 
-    // connect to the same host this was served from
-    var client = new BinaryClient('ws://' + document.location.host);
+    // load the transport
+    var transport = new Transport();
 
-    client.on('stream', function(stream, meta){
-
-      var handler = function(data){
-        if(client_id){
-          parts.push(data);  
-        } else {
-          client_id = data;  
-          clientid.value = client_id;
-        }
-
-        // // first message is the client id
-        // client_id = data;
-        // console.log("client id:" + client_id);
-        // clientid.value = client_id
-
-        // // start collecting parts
-        // handler = function(data){
-        //   parts.push(data);  
-        // }
-      }
-
-      // collect stream data
-      parts = [];
-      stream.on('data', handler);
-
-      // when finished, set it as the background image
-      stream.on('end', function(){
-        var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
-        document.body.style.backgroundImage = 'url(' + url + ')';
-      });
-
-    });
 
     // listen for a file being chosen
     fileinput.addEventListener('change', function(event){
@@ -64,7 +31,9 @@
         li.addEventListener('click', function(f){
           return function(){
             console.log("send", f)
-            client.send(f, {target:targetid.value});
+
+            // SEND THE FILE
+            transport.send(f, targetid.value, f.name);
           }
         }(file), false)
 
